@@ -1,0 +1,3 @@
+NoAI: This project may not be used in datasets for, in the development of, or as inputs to generative AI programs.
+NoAI-Derivative: Any applications, programs, or works created using this tool are subject to the same AI usage restrictions and must include this notice.
+§44b: Dies ist ein in maschinenlesbarer Form vorliegender Nutzungsvorbehalt entsprechend §44b UrhG
