@@ -1,5 +1,7 @@
 use crate::render::{RenderContext, window_size_dependent_setup};
 use crate::vertex::MyVertex;
+mod physical_device;
+use physical_device::select_physical_device_and_queue_family;
 
 use std::sync::Arc;
 use vulkano::{
@@ -9,8 +11,8 @@ use vulkano::{
         RenderPassBeginInfo, SubpassBeginInfo, SubpassContents,
     },
     device::{
-        physical::PhysicalDeviceType, Device, DeviceCreateInfo, DeviceExtensions, Queue,
-        QueueCreateInfo, QueueFlags,
+        Device, DeviceCreateInfo, DeviceExtensions, Queue,
+        QueueCreateInfo,
     },
     image::{ImageUsage},
     instance::{Instance, InstanceCreateFlags, InstanceCreateInfo},
@@ -72,33 +74,8 @@ impl App {
             ..DeviceExtensions::empty()
         };
 
-        let (physical_device, queue_family_index) = instance
-            .enumerate_physical_devices()
-            .unwrap()
-            .filter(|p|{
-                p.supported_extensions().contains(&device_extensions)
-            })
-            .filter_map(|p|{
-                p.queue_family_properties()
-                    .iter()
-                    .enumerate()
-                    .position(|(i,q)|{
-                        q.queue_flags.intersects(QueueFlags::GRAPHICS)
-                            && p.presentation_support(i as u32, event_loop).unwrap()
-                    })
-                    .map(|i|(p,i as u32))
-            })
-            .min_by_key(|(p,_)|{
-                match p.properties().device_type {
-                    PhysicalDeviceType::DiscreteGpu => 0,
-                    PhysicalDeviceType::IntegratedGpu => 1,
-                    PhysicalDeviceType::VirtualGpu => 2,
-                    PhysicalDeviceType::Cpu => 3,
-                    PhysicalDeviceType::Other => 4,
-                    _ => 5,
-                }
-            })
-            .expect("no suitable physical device found");
+        let (physical_device, queue_family_index) = 
+            select_physical_device_and_queue_family(&instance, &device_extensions, event_loop);
 
             println!(
                 "Using device: {} (type: {:?})",
