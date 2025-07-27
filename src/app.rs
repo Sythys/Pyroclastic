@@ -77,72 +77,72 @@ impl App {
         let (physical_device, queue_family_index) = 
             select_physical_device_and_queue_family(&instance, &device_extensions, event_loop);
 
-            println!(
-                "Using device: {} (type: {:?})",
-                physical_device.properties().device_name,
-                physical_device.properties().device_type,
-            );
-            //TODO: follow along triangle more
-    
-            let (device, mut queues) = Device::new(
-                physical_device,
-                DeviceCreateInfo {
-                    enabled_extensions: device_extensions,
-                    queue_create_infos: vec![QueueCreateInfo {
-                        queue_family_index,
-                        ..Default::default()
-                    }],
+        println!(
+            "Using device: {} (type: {:?})",
+            physical_device.properties().device_name,
+            physical_device.properties().device_type,
+        );
+        //TODO: follow along triangle more
+
+        let (device, mut queues) = Device::new(
+            physical_device,
+            DeviceCreateInfo {
+                enabled_extensions: device_extensions,
+                queue_create_infos: vec![QueueCreateInfo {
+                    queue_family_index,
                     ..Default::default()
-                },
-            ).unwrap();
-
-            let queue = queues.next().unwrap();
-
-            let memory_allocator = Arc::new(StandardMemoryAllocator::new_default(
-                device.clone(),
-            ));
-
-            let command_buffer_allocator = Arc::new(StandardCommandBufferAllocator::new(
-                device.clone(),
-                Default::default(),
-            ));
-
-            let vertices = [
-                MyVertex {
-                    position: [-0.5, -0.25],
-                },
-                MyVertex {
-                    position: [0.0, 0.5],
-                },
-                MyVertex {
-                    position: [0.25, -0.1],
-                },
-            ];
-
-            let vertex_buffer = Buffer::from_iter(
-            memory_allocator,
-            BufferCreateInfo {
-                usage: BufferUsage::VERTEX_BUFFER,
+                }],
                 ..Default::default()
             },
-            AllocationCreateInfo {
-                memory_type_filter: MemoryTypeFilter::PREFER_DEVICE
-                    | MemoryTypeFilter::HOST_SEQUENTIAL_WRITE,
-                ..Default::default()
+        ).unwrap();
+
+        let queue = queues.next().unwrap();
+
+        let memory_allocator = Arc::new(StandardMemoryAllocator::new_default(
+            device.clone(),
+        ));
+
+        let command_buffer_allocator = Arc::new(StandardCommandBufferAllocator::new(
+            device.clone(),
+            Default::default(),
+        ));
+
+        let vertices = [
+            MyVertex {
+                position: [-0.5, -0.25],
             },
-            vertices,
-            ).unwrap();
+            MyVertex {
+                position: [0.0, 0.5],
+            },
+            MyVertex {
+                position: [0.25, -0.1],
+            },
+        ];
 
-            let rcx = None;
+        let vertex_buffer = Buffer::from_iter(
+        memory_allocator,
+        BufferCreateInfo {
+            usage: BufferUsage::VERTEX_BUFFER,
+            ..Default::default()
+        },
+        AllocationCreateInfo {
+            memory_type_filter: MemoryTypeFilter::PREFER_DEVICE
+                | MemoryTypeFilter::HOST_SEQUENTIAL_WRITE,
+            ..Default::default()
+        },
+        vertices,
+        ).unwrap();
 
-            App {
-                instance,
-                device,
-                queue,
-                command_buffer_allocator,
-                vertex_buffer,
-                rcx,
-            }
+        let rcx = None;
+
+        App {
+            instance,
+            device,
+            queue,
+            command_buffer_allocator,
+            vertex_buffer,
+            rcx,
+        }
     }
 }
 
